@@ -1,10 +1,12 @@
 import "./styles.css";
+import Box from "./components/box";
 
 export default function App() {
   return (
-    <div className="App">
-      <h1>Hello CodeSandbox</h1>
-      <h2>Testing 12345</h2>
+    <div>
+      <h1>Box Drawing Example</h1>
+      <Box width={200} height={200} color="black" />
+      <Box width={150} height={150} color="red" />
     </div>
   );
 }
