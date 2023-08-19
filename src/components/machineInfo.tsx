@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import jsonData from "../machines.json";
 
+type MachineProp = {
+  name: string;
+};
+
 type machineType = {
   name: string;
   colour: string;
@@ -20,15 +24,22 @@ const type2: machineType = { name: "Assembly", colour: "green" };
 const type3: machineType = { name: "Fabrication", colour: "black" };
 const type4: machineType = { name: "Chemical", colour: "yellow" };
 
-const machine1: machine = {
-  name: "Board Room",
-  type: type1,
-  floor: 3,
-  x: 1,
-  y: 1,
-  links: [],
+// const machine1: machine = {
+//   name: "Board Room",
+//   type: type1,
+//   floor: 3,
+//   x: 1,
+//   y: 1,
+//   links: [],
+// };
+
+const MachineDeck: React.FC = () => {
+  const machines = JSON.parse(JSON.stringify(jsonData.machines));
+  return (
+    <div>
+      <p>There {machines.length} machines in the list.</p>
+    </div>
+  );
 };
 
-
-
-export default machine1;
+export default MachineDeck;
