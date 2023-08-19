@@ -34,6 +34,10 @@
       "name": "eject",
       "command": "yarn eject",
       "runAtStart": false
+    },
+    "setTask": {
+      "name": "setTask",
+      "command": "yarn install"
     }
   }
 }
