@@ -17,7 +17,7 @@
     "redux": "4.0.1",
     "redux-thunk": "2.3.0",
     "react-fullscreen-crossbrowser": "1.1.2",
-    "webpack": "^4.0.0",
+    "webpack": "^5.88.2",
     "css-loader": "^1.0.0",
     "css-modules-typescript-loader": "^2.0.1",
     "node-sass": "9.0.0"

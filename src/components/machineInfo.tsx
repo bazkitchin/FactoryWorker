@@ -1,3 +1,6 @@
+import React, { useState, useEffect } from "react";
+import jsonData from "../machines.json";
+
 type machineType = {
   name: string;
   colour: string;
@@ -25,5 +28,7 @@ const machine1: machine = {
   y: 1,
   links: [],
 };
+
+
 
 export default machine1;
