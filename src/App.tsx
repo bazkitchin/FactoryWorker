@@ -14,7 +14,6 @@ export default function App() {
         <Box width={200} height={200} color="black" />
         <Box width={150} height={150} color="red" />
         <StatusComponent />
-        <FullScreenComponent />
       </div>
     </Provider>
   );
