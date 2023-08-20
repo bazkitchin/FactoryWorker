@@ -40,31 +40,16 @@ const CanvasHelper: React.FC = () => {
           windowHeight = canvasOffSet.bottom - canvasOffSet.top;
         }
         const context = canvas.getContext("2d");
-
         canvas.width = windowWidth * scale;
         canvas.height = windowHeight * scale;
         canvas.style.width = windowWidth + "px";
         canvas.style.height = windowHeight + "px";
         if (context) {
           context.scale(scale, scale);
-          redrawAll();
           const canvasOffSet = canvas.getBoundingClientRect();
           mouseOffsetX = canvasOffSet.left;
           mouseOffsetY = canvasOffSet.top;
-          //   const sizeString: string =
-          //     "Canvas = T:" +
-          //     canvasOffSet.top +
-          //     ", B:" +
-          //     canvasOffSet.bottom +
-          //     ", L:" +
-          //     canvasOffSet.right +
-          //     ", R:" +
-          //     canvasOffSet.left;
-          //   setParagraphContent(sizeString);
-
-          //   context.fillText(sizeString, 0, 20);
-          //   context.fillText(canvas.width + "x" + canvas.height, 0, 20);
-          //   context.fillRect(100, 100, 100, 100);
+          redrawAll();
         }
       }
     };
@@ -83,35 +68,90 @@ const CanvasHelper: React.FC = () => {
     };
   }, []);
 
+  const drawRect = (
+    canvas: HTMLCanvasElement,
+    context: CanvasRenderingContext2D,
+    colour: string,
+    positionX: number,
+    positionY: number,
+    width: number,
+    height: number,
+    mouseUp: boolean,
+    mouseX: number,
+    mouseY: number
+  ) => {
+    let scaledPosX = Math.round((canvas.width * positionX) / scale);
+    let scaledPosY = Math.round((canvas.height * positionY) / scale);
+    let scaledWidth = Math.round((canvas.width * width) / scale);
+    let scaledHeight = Math.round((canvas.height * height) / scale);
+    if (
+      mouseUp &&
+      mouseX >= scaledPosX &&
+      mouseY >= scaledPosY &&
+      mouseX < scaledPosX + scaledWidth &&
+      mouseY < scaledPosY + scaledHeight
+    ) {
+      context.fillStyle = "green";
+    } else {
+      context.fillStyle = colour;
+    }
+
+    context.fillRect(scaledPosX, scaledPosY, scaledWidth, scaledHeight);
+    //context.fillRect(100, 100, 50, 50);
+  };
+
   const redrawAll = () => {
     const canvas = canvasRef.current;
     if (canvas) {
       const context = canvas.getContext("2d");
       if (context) {
-        context.clearRect(0, 0, canvas.width, canvas.height); // Clear the entire canvas
-        //
+        // context.clearRect(0, 0, canvas.width, canvas.height); // Clear the entire canvas
+        context.fillStyle = "lightgrey";
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        drawRect(
+          canvas,
+          context,
+          "red",
+          0.5,
+          0.5,
+          0.25,
+          0.25,
+          mouseUp,
+          mouseX,
+          mouseY
+        );
+        drawRect(
+          canvas,
+          context,
+          "black",
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          mouseUp,
+          mouseX,
+          mouseY
+        );
+        context.fillStyle = "black";
         context.font = "20px Arial";
-        context.fillText(mouseX + "x" + mouseY, 0, 20);
+        context.fillText(canvas.width + "x" + canvas.height, 0, 20);
+        // context.fillText(mouseX + "x" + mouseY, 0, 20);
         if (mouseUp === true) {
           context.fillStyle = "red";
           mouseUp = false;
         } else {
           context.fillStyle = "blue";
         }
-        context.fillRect(100, 100, 100, 100);
+        context.font = "20px Arial";
+        context.fillText(canvas.width + "x" + canvas.height, 0, 20);
+        // for (let i = 0; i < 3; i++) {
+        //   context.fillRect(100 * i, 100, 50, 50);
+        // }
       }
     }
   };
 
   const handleMouseUp = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    // const canvas = canvasRef.current;
-    // if (canvas) {
-    //   const context = canvas.getContext("2d");
-    //   if (context) {
-    //     context.fillStyle = "red";
-    //     redrawAll();
-    //   }
-    // }
     mouseUp = true;
     mouseX = event.clientX - mouseOffsetX;
     mouseY = event.clientY - mouseOffsetY;
@@ -126,7 +166,6 @@ const CanvasHelper: React.FC = () => {
         ref={canvasRef}
         onMouseUp={handleMouseUp}
       ></canvas>
-      {/* <h1>{paragraphContent}</h1> */}
     </div>
   );
 };
