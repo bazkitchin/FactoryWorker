@@ -1,0 +1,15 @@
+.canvas-container-rect {
+  height: 100%;
+  width: 100%;
+  aspect-ratio: auto;
+  border: 0px solid #ff0000;
+}
+
+.canvas-absolute-position {
+  height: 100px;
+  width: 100px;
+  border: 0px solid #000;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}

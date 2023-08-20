@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import jsonData from "../machines.json";
+// import jsonData from "../machines.json";
 
 type MachineProp = {
   name: string;
@@ -34,11 +34,9 @@ const type4: machineType = { name: "Chemical", colour: "yellow" };
 // };
 
 const MachineDeck: React.FC = () => {
-  const machines = JSON.parse(JSON.stringify(jsonData.machines));
+  // const machines = JSON.parse(JSON.stringify(jsonData.machines));
   return (
-    <div>
-      <p>There {machines.length} machines in the list.</p>
-    </div>
+    <div>{/* <p>There {machines.length} machines in the list.</p> */}</div>
   );
 };
 
