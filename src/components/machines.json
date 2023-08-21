@@ -1,5 +1,5 @@
 {
-  "machines": [
+  "machinesList": [
     {
       "name": "Board Room",
       "type": 1,

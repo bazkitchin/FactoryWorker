@@ -1,6 +1,5 @@
 import React, { CSSProperties } from "react";
 import Box from "./box";
-import MachineDeck from "./machineInfo";
 import "./styles/faultCard.css";
 
 const FaultCard: React.FC = () => {
