@@ -1,7 +1,7 @@
 import React, { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import "./styles/canvasStyle.css";
-import { machineList } from "./machineInfo";
+import { machineList, machine, handleLinks } from "./machineInfo";
 
 const CanvasHelper: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -137,6 +137,34 @@ const CanvasHelper: React.FC = () => {
     }
   };
 
+  const drawLine = (
+    canvas: HTMLCanvasElement,
+    context: CanvasRenderingContext2D,
+    colour: string,
+    startId: number,
+    endId: machine
+  ) => {
+    context.beginPath();
+    let machine = machineList[startId];
+    if (machine) {
+      let scaledPosX = Math.round((canvas.width * machine.x) / scale);
+      let scaledPosY = Math.round((canvas.height * machine.y) / scale);
+      let scaledWidth = Math.round((canvas.width * 0.1) / (scale * 2));
+      let scaledHeight = Math.round((canvas.height * 0.1) / (scale * 2));
+      context.moveTo(scaledPosX + scaledWidth, scaledPosY + scaledHeight);
+    }
+    if (endId) {
+      let scaledPosX = Math.round((canvas.width * endId.x) / scale);
+      let scaledPosY = Math.round((canvas.height * endId.y) / scale);
+      let scaledWidth = Math.round((canvas.width * 0.1) / (scale * 2));
+      let scaledHeight = Math.round((canvas.height * 0.1) / (scale * 2));
+      context.lineTo(scaledPosX + scaledWidth, scaledPosY + scaledHeight);
+    }
+    context.strokeStyle = colour;
+    context.lineWidth = 3;
+    context.stroke();
+  };
+
   const redrawAll = () => {
     const canvas = canvasRef.current;
     if (canvas) {
@@ -154,10 +182,16 @@ const CanvasHelper: React.FC = () => {
           selectedFloor = 2;
         if (drawRect(canvas, context, "slategrey", 0.95, 0.75, 0.05, 0.15))
           selectedFloor = 1;
-
+        handleLinks();
         // draw machines
         for (let i = 0; i < machineList.length; i++) {
           if (machineList[i].floor === selectedFloor) {
+            let colour = "white";
+            // if (i === clickedMachine) colour = "green";
+            for (let j = 0; j < machineList[i].links.length; j++) {
+              drawLine(canvas, context, colour, i, machineList[i].links[j]);
+            }
+            context.lineWidth = 1;
             drawMachines(canvas, context, i);
           }
         }
@@ -175,8 +209,10 @@ const CanvasHelper: React.FC = () => {
         context.font = "20px Arial";
 
         // context.fillText(canvas.width + "x" + canvas.height, 0, 20);
-        // context.fillText(" " + clickedMachine, 0, 20);
-        context.fillText(mouseX + "x" + mouseY, 0, 20);
+        if (machineList[clickedMachine] && !mouseUp) {
+          context.fillText(" " + machineList[clickedMachine].name, 0, 20);
+        }
+        //context.fillText(mouseX + "x" + mouseY, 0, 20);
       }
     }
   };

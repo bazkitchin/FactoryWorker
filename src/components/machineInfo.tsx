@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from "react";
-// import jsonData from "./machines.json";
 
-type MachineProp = {
-  name: string;
-};
-
-type machineType = {
+export type machineType = {
   name: string;
   colour: string;
 };
 
-type machine = {
+export type machine = {
   name: string;
   type: machineType;
   floor: number;
@@ -22,11 +17,15 @@ type machine = {
   links: machine[];
 };
 
-const type1: machineType = { name: "Office", colour: "blue" };
-const type2: machineType = { name: "Assembly", colour: "green" };
-const type3: machineType = { name: "Chemical", colour: "yellow" };
-const type4: machineType = { name: "Fabrication", colour: "darkslategray" };
-const type5: machineType = { name: "Other", colour: "silver" };
+export const type1: machineType = { name: "Office", colour: "blue" };
+export const type2: machineType = { name: "Assembly", colour: "green" };
+export const type3: machineType = { name: "Chemical", colour: "yellow" };
+export const type4: machineType = {
+  name: "Fabrication",
+  colour: "darkslategray",
+};
+export const type5: machineType = { name: "Special", colour: "silver" };
+export const type6: machineType = { name: "JAM!", colour: "red" };
 
 // ------------------------------------------------------ Office Machines
 let machine1: machine = {
@@ -399,7 +398,7 @@ let machine33: machine = {
 let machine34: machine = {
   name: "Distillery",
   type: type3,
-  floor: 1,
+  floor: 3,
   x: 0.6,
   y: 0.55,
   computer: false,
@@ -445,7 +444,7 @@ let machine37: machine = {
 let machine38: machine = {
   name: "Workshop",
   type: type4,
-  floor: 3,
+  floor: 2,
   x: 0.45,
   y: 0.3,
   computer: false,
@@ -651,3 +650,6 @@ export let machineList: machine[] = [
   machine50,
   machine51,
 ];
+export function handleLinks() {
+  machine1.links = [machine2, machine3, machine7, machine12];
+}
