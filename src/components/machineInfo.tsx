@@ -652,4 +652,12 @@ export let machineList: machine[] = [
 ];
 export function handleLinks() {
   machine1.links = [machine2, machine3, machine7, machine12];
+
+  machineList.forEach((machine) => {
+    machine.links.forEach((linkedMachine) => {
+      if (!linkedMachine.links.includes(machine)) {
+        linkedMachine.links.push(machine);
+      }
+    });
+  });
 }

@@ -1,18 +1,29 @@
 import React, { CSSProperties } from "react";
 import { useEffect, useRef, useState } from "react";
 import "./styles/canvasStyle.css";
-import { machineList, machine, handleLinks } from "./machineInfo";
+import * as machine from "./machineInfo";
+import { shuffleArray } from "./helperFunctions";
+import * as player from "./playerInfo";
 
 const CanvasHelper: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const windowRef = useRef<HTMLCanvasElement | null>(null);
   const [paragraphContent, setParagraphContent] =
     useState<string>("Initial content");
-
-  let selectedFloor: number = 1;
-
   const contextRef = useRef(null);
+
+  // game related
+  let newGame: boolean = true;
+  let numberOfPlayers: number = 4;
+  let players: player.player[] = [];
+  let spannerDeckGame: player.spanner[];
+  let currentPlayerNum: number = 0;
+  let currentPlayer: player.player;
+  let gameEvents: string = "";
+
+  //interface related
   const scale = 2;
+  let selectedFloor: number = 1;
   let mouseUp = false;
   let mouseX = -1;
   let mouseY = -1;
@@ -72,6 +83,19 @@ const CanvasHelper: React.FC = () => {
     };
   }, []);
 
+  const drawText = (
+    canvas: HTMLCanvasElement,
+    context: CanvasRenderingContext2D,
+    text: string,
+    colour: string,
+    positionX: number,
+    positionY: number
+  ) => {
+    let scaledPosX = Math.round((canvas.width * positionX) / scale);
+    let scaledPosY = Math.round((canvas.height * positionY) / scale);
+    context.fillText(text, scaledPosX, scaledPosY);
+  };
+
   const drawRect = (
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
@@ -79,7 +103,8 @@ const CanvasHelper: React.FC = () => {
     positionX: number,
     positionY: number,
     width: number,
-    height: number
+    height: number,
+    clickable: boolean = true
   ): boolean => {
     let scaledPosX = Math.round((canvas.width * positionX) / scale);
     let scaledPosY = Math.round((canvas.height * positionY) / scale);
@@ -87,6 +112,11 @@ const CanvasHelper: React.FC = () => {
     let scaledHeight = Math.round((canvas.height * height) / scale);
     context.fillStyle = colour;
     context.fillRect(scaledPosX, scaledPosY, scaledWidth, scaledHeight);
+    if (!clickable) {
+      context.strokeStyle = "black";
+      context.strokeRect(scaledPosX, scaledPosY, scaledWidth, scaledHeight);
+      return false;
+    }
     let clicked = false;
     if (
       mouseUp &&
@@ -113,27 +143,27 @@ const CanvasHelper: React.FC = () => {
     context: CanvasRenderingContext2D,
     id: number
   ) => {
-    let machine = machineList[id];
-    if (machine) {
-      let scaledPosX = Math.round((canvas.width * machine.x) / scale);
-      let scaledPosY = Math.round((canvas.height * machine.y) / scale);
+    let newMachine = machine.machineList[id];
+    if (newMachine) {
+      let scaledPosX = Math.round((canvas.width * newMachine.x) / scale);
+      let scaledPosY = Math.round((canvas.height * newMachine.y) / scale);
       let scaledWidth = Math.round((canvas.width * 0.1) / scale);
       let scaledHeight = Math.round((canvas.height * 0.1) / scale);
       if (
         drawRect(
           canvas,
           context,
-          machine.type.colour,
-          machine.x,
-          machine.y,
+          newMachine.type.colour,
+          newMachine.x,
+          newMachine.y,
           0.1,
           0.1
         )
       )
         clickedMachine = id;
-      context.fillStyle = machine.type.colour;
+      context.fillStyle = newMachine.type.colour;
       context.font = "10px Arial";
-      context.fillText(machine.name, scaledPosX, scaledPosY - 5);
+      context.fillText(newMachine.name, scaledPosX, scaledPosY - 5);
     }
   };
 
@@ -142,13 +172,13 @@ const CanvasHelper: React.FC = () => {
     context: CanvasRenderingContext2D,
     colour: string,
     startId: number,
-    endId: machine
+    endId: machine.machine
   ) => {
     context.beginPath();
-    let machine = machineList[startId];
-    if (machine) {
-      let scaledPosX = Math.round((canvas.width * machine.x) / scale);
-      let scaledPosY = Math.round((canvas.height * machine.y) / scale);
+    let newMachine = machine.machineList[startId];
+    if (newMachine) {
+      let scaledPosX = Math.round((canvas.width * newMachine.x) / scale);
+      let scaledPosY = Math.round((canvas.height * newMachine.y) / scale);
       let scaledWidth = Math.round((canvas.width * 0.1) / (scale * 2));
       let scaledHeight = Math.round((canvas.height * 0.1) / (scale * 2));
       context.moveTo(scaledPosX + scaledWidth, scaledPosY + scaledHeight);
@@ -165,11 +195,66 @@ const CanvasHelper: React.FC = () => {
     context.stroke();
   };
 
+  const drawPlayers = (
+    canvas: HTMLCanvasElement,
+    context: CanvasRenderingContext2D
+  ) => {
+    for (let i = 0; i < players.length; i++) {
+      let top = 0.15 + 0.2 * i;
+      let col = players[i].colour;
+      drawRect(canvas, context, col, 0, top, 0.05, 0.15);
+      if (players[i] && players[i].spanners) {
+        for (let j = 0; j < players[i].spanners.length; j++) {
+          let newTop = top + 0.02 * j;
+          let col = players[i].spanners[j].type.colour;
+          drawRect(canvas, context, col, 0.05, newTop, 0.02, 0.01, false);
+        }
+      }
+    }
+  };
+
+  function givePlayerSpanner() {
+    for (let i = 0; i < 2; i++) {
+      let newSpanner = spannerDeckGame.pop();
+      if (newSpanner?.type == machine.type6) {
+        gameEvents = "Player " + (currentPlayerNum + 1) + " draw a JAM!";
+      } else {
+        if (newSpanner) currentPlayer.spanners.push(newSpanner);
+      }
+    }
+  }
+
+  function setupPlayers() {
+    for (let i = 0; i < numberOfPlayers; i++) {
+      let newPlayer: player.player = {
+        name: "Player " + i,
+        colour: "blue",
+        location: machine.machineList[7],
+        spanners: [],
+      };
+      for (let j = 0; j < 2; j++) {
+        let newSpanner = spannerDeckGame.pop();
+        if (newSpanner) newPlayer.spanners.push(newSpanner);
+      }
+      players.push(newPlayer);
+    }
+    currentPlayer = players[0];
+  }
+
   const redrawAll = () => {
     const canvas = canvasRef.current;
     if (canvas) {
       const context = canvas.getContext("2d");
       if (context) {
+        if (newGame) {
+          newGame = false;
+          machine.handleLinks();
+          player.makeSpannerDeck();
+          spannerDeckGame = shuffleArray<player.spanner>(player.spannerDeck);
+          setupPlayers();
+          player.addJamSpanners(spannerDeckGame);
+          spannerDeckGame = shuffleArray<player.spanner>(spannerDeckGame);
+        }
         // context.clearRect(0, 0, canvas.width, canvas.height); // Clear the entire canvas
         // clear cavnas
         context.fillStyle = "lightgrey";
@@ -182,37 +267,48 @@ const CanvasHelper: React.FC = () => {
           selectedFloor = 2;
         if (drawRect(canvas, context, "slategrey", 0.95, 0.75, 0.05, 0.15))
           selectedFloor = 1;
-        handleLinks();
+
         // draw machines
-        for (let i = 0; i < machineList.length; i++) {
-          if (machineList[i].floor === selectedFloor) {
+        for (let i = 0; i < machine.machineList.length; i++) {
+          if (machine.machineList[i].floor === selectedFloor) {
             let colour = "white";
             // if (i === clickedMachine) colour = "green";
-            for (let j = 0; j < machineList[i].links.length; j++) {
-              drawLine(canvas, context, colour, i, machineList[i].links[j]);
+            for (let j = 0; j < machine.machineList[i].links.length; j++) {
+              drawLine(
+                canvas,
+                context,
+                colour,
+                i,
+                machine.machineList[i].links[j]
+              );
             }
-            context.lineWidth = 1;
+          }
+        }
+        context.lineWidth = 1;
+        for (let i = 0; i < machine.machineList.length; i++) {
+          if (machine.machineList[i].floor === selectedFloor) {
             drawMachines(canvas, context, i);
           }
         }
 
+        if (drawRect(canvas, context, "red", 0.75, 0.95, 0.15, 0.05)) {
+          givePlayerSpanner();
+          currentPlayerNum = currentPlayerNum + 1;
+          if (currentPlayerNum >= players.length) {
+            currentPlayerNum = 0;
+          }
+          currentPlayer = players[currentPlayerNum];
+        }
+        context.fillStyle = "black";
+        context.font = "16px Arial";
+        drawText(canvas, context, "End Turn", "black", 0.77, 0.99);
+
+        drawPlayers(canvas, context);
+
+        // debug information
         context.fillStyle = "black";
         context.font = "20px Arial";
-        // context.fillText(canvas.width + "x" + canvas.height, 0, 20);
-        // context.fillText(mouseX + "x" + mouseY, 0, 20);
-
-        if (mouseUp === true) {
-          context.fillStyle = "red";
-        } else {
-          context.fillStyle = "black";
-        }
-        context.font = "20px Arial";
-
-        // context.fillText(canvas.width + "x" + canvas.height, 0, 20);
-        if (machineList[clickedMachine] && !mouseUp) {
-          context.fillText(" " + machineList[clickedMachine].name, 0, 20);
-        }
-        //context.fillText(mouseX + "x" + mouseY, 0, 20);
+        context.fillText(" " + gameEvents, 0, 20);
       }
     }
   };
