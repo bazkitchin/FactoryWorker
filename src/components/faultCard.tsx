@@ -1,20 +1,30 @@
-import React, { CSSProperties } from "react";
-import Box from "./box";
-import "./styles/faultCard.css";
+import * as machine from "./machineInfo";
 
-const FaultCard: React.FC = () => {
-  const CONTAINER: CSSProperties = {
-    // color: machine1.type.colour,
-  };
-  return (
-    <div className="card">
-      <div style={CONTAINER}>
-        {/* <h1 className="value">{MachineDeck.name}</h1> */}
-        {/* <p className="info">{machine1.type.name}</p>
-        <p className="info">{machine1.floor}</p> */}
-      </div>
-    </div>
-  );
+export type faultCard = {
+  machineRef: machine.machine;
+  name: string;
+  type: machine.machineType;
+  floor: number;
+  x: number;
+  y: number;
 };
 
-export default FaultCard;
+export let faultDeck: faultCard[] = [];
+
+export function buildFaultCards() {
+  for (let i = 0; i < machine.machineList.length; i++) {
+    let newfaultCard: faultCard = {
+      machineRef: machine.machineList[i],
+      name: machine.machineList[i].name,
+      type: machine.machineList[i].type,
+      floor: machine.machineList[i].floor,
+      x: machine.machineList[i].x,
+      y: machine.machineList[i].y,
+    };
+    faultDeck.push(newfaultCard);
+  }
+}
+
+export function addFault() {
+  
+}

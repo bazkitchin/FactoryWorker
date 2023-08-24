@@ -4,6 +4,7 @@ import "./styles/canvasStyle.css";
 import * as machine from "./machineInfo";
 import { shuffleArray } from "./helperFunctions";
 import * as player from "./playerInfo";
+import * as fault from "./faultCard";
 
 const CanvasHelper: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -17,9 +18,12 @@ const CanvasHelper: React.FC = () => {
   let numberOfPlayers: number = 4;
   let players: player.player[] = [];
   let spannerDeckGame: player.spanner[];
+  let faultDeckGame: fault.faultCard[] = [];
+  let faultDeckGameDiscard: fault.faultCard[] = [];
   let currentPlayerNum: number = 0;
   let currentPlayer: player.player;
   let gameEvents: string = "";
+  let faultCardsDrawn: number = 2;
 
   //interface related
   const scale = 2;
@@ -164,6 +168,7 @@ const CanvasHelper: React.FC = () => {
       context.fillStyle = newMachine.type.colour;
       context.font = "10px Arial";
       context.fillText(newMachine.name, scaledPosX, scaledPosY - 5);
+      // for (let )
     }
   };
 
@@ -246,11 +251,14 @@ const CanvasHelper: React.FC = () => {
     if (canvas) {
       const context = canvas.getContext("2d");
       if (context) {
+        // --------------------------------------- start of new game
         if (newGame) {
           newGame = false;
           machine.handleLinks();
           player.makeSpannerDeck();
+          fault.buildFaultCards();
           spannerDeckGame = shuffleArray<player.spanner>(player.spannerDeck);
+          faultDeckGame = shuffleArray<fault.faultCard>(fault.faultDeck);
           setupPlayers();
           player.addJamSpanners(spannerDeckGame);
           spannerDeckGame = shuffleArray<player.spanner>(spannerDeckGame);
@@ -291,6 +299,7 @@ const CanvasHelper: React.FC = () => {
           }
         }
 
+        // --------------------------------------- end players turn
         if (drawRect(canvas, context, "red", 0.75, 0.95, 0.15, 0.05)) {
           givePlayerSpanner();
           currentPlayerNum = currentPlayerNum + 1;
