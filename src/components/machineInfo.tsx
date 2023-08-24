@@ -651,8 +651,64 @@ export let machineList: machine[] = [
   machine51,
 ];
 export function handleLinks() {
-  machine1.links = [machine2, machine3, machine7, machine12];
+  // top floor links
+  machine1.links = [machine2, machine3, machine7, machine11, machine12];
+  machine2.links = [machine12];
+  machine3.links = [machine11];
+  machine7.links = [machine9, machine12, machine51];
+  machine9.links = [machine10, machine47];
+  machine10.links = [machine39, machine51];
+  machine11.links = [];
+  machine12.links = [machine13];
+  machine13.links = [machine23];
+  machine22.links = [machine23, machine34, machine51];
+  machine23.links = [];
+  machine33.links = [machine34, machine39];
+  machine34.links = [];
+  machine39.links = [machine46, machine47];
+  machine46.links = [machine47];
+  machine47.links = [];
 
+  // ground floor links
+  machine5.links = [machine6, machine15];
+  machine6.links = [machine17, machine38, machine43, machine50];
+  machine14.links = [machine15, machine21];
+  machine15.links = [machine21];
+  machine17.links = [machine21, machine50];
+  machine18.links = [machine19, machine21];
+  machine19.links = [machine40, machine44];
+  machine21.links = [];
+  machine27.links = [machine29, machine38, machine48];
+  machine29.links = [machine48];
+  machine37.links = [machine40];
+  machine38.links = [machine42, machine50];
+  machine40.links = [machine44, machine48, machine50];
+  machine42.links = [];
+  machine44.links = [];
+  machine48.links = [];
+
+  // basement links
+  machine4.links = [machine8, machine26, machine49];
+  machine8.links = [machine16];
+  machine16.links = [machine20, machine24];
+  machine20.links = [machine43, machine49];
+  machine24.links = [machine41];
+  machine25.links = [machine30, machine32];
+  machine26.links = [machine28, machine36];
+  machine28.links = [machine30, machine36, machine35];
+  machine30.links = [];
+  machine31.links = [machine35, machine32];
+  machine32.links = [machine35];
+  machine35.links = [machine49];
+  machine36.links = [];
+  machine41.links = [machine43, machine45];
+  machine43.links = [machine45, machine49];
+  machine45.links = [];
+
+  // lift links
+  machine49.links = [machine50, machine51];
+
+  // make all links bi-directional
   machineList.forEach((machine) => {
     machine.links.forEach((linkedMachine) => {
       if (!linkedMachine.links.includes(machine)) {
