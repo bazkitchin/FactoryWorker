@@ -230,6 +230,7 @@ const CanvasHelper: React.FC = () => {
   }
 
   function setupPlayers() {
+    players = [];
     for (let i = 0; i < numberOfPlayers; i++) {
       let newPlayer: player.player = {
         name: "Player " + i,
@@ -240,10 +241,10 @@ const CanvasHelper: React.FC = () => {
       for (let j = 0; j < 2; j++) {
         let newSpanner = spannerDeckGame.pop();
         if (newSpanner) newPlayer.spanners.push(newSpanner);
+        if (spannerDeckGame.length <= 0) newGame = true;
       }
       players.push(newPlayer);
     }
-    currentPlayer = players[0];
   }
 
   const redrawAll = () => {
@@ -262,6 +263,8 @@ const CanvasHelper: React.FC = () => {
           setupPlayers();
           player.addJamSpanners(spannerDeckGame);
           spannerDeckGame = shuffleArray<player.spanner>(spannerDeckGame);
+          currentPlayer = players[0];
+          currentPlayerNum = 1;
         }
         // context.clearRect(0, 0, canvas.width, canvas.height); // Clear the entire canvas
         // clear cavnas
@@ -300,7 +303,7 @@ const CanvasHelper: React.FC = () => {
         }
 
         // --------------------------------------- end players turn
-        if (drawRect(canvas, context, "red", 0.75, 0.95, 0.15, 0.05)) {
+        if (drawRect(canvas, context, "red", 0.75, 0.0, 0.15, 0.1)) {
           givePlayerSpanner();
           currentPlayerNum = currentPlayerNum + 1;
           if (currentPlayerNum >= players.length) {
@@ -310,7 +313,7 @@ const CanvasHelper: React.FC = () => {
         }
         context.fillStyle = "black";
         context.font = "16px Arial";
-        drawText(canvas, context, "End Turn", "black", 0.77, 0.99);
+        drawText(canvas, context, "End Turn", "black", 0.77, 0.09);
 
         drawPlayers(canvas, context);
 

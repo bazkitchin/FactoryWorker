@@ -14,6 +14,7 @@ export type player = {
 export let spannerDeck: spanner[] = [];
 
 export function makeSpannerDeck() {
+  spannerDeck = [];
   for (let i = 0; i < 12; i++) {
     let spanner1: spanner = { type: machine.type1 };
     let spanner2: spanner = { type: machine.type2 };

@@ -12,6 +12,7 @@ export type faultCard = {
 export let faultDeck: faultCard[] = [];
 
 export function buildFaultCards() {
+  faultDeck = [];
   for (let i = 0; i < machine.machineList.length; i++) {
     let newfaultCard: faultCard = {
       machineRef: machine.machineList[i],
@@ -25,6 +26,4 @@ export function buildFaultCards() {
   }
 }
 
-export function addFault() {
-  
-}
+export function addFault() {}
