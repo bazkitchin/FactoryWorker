@@ -163,12 +163,60 @@ const CanvasHelper: React.FC = () => {
           0.1,
           0.1
         )
-      )
+      ) {
         clickedMachine = id;
+      }
+      if (newMachine.computer) {
+        let faultPosX = newMachine.x;
+        let faultPosY = newMachine.y;
+        let faultSizeX = 0.033; // * 0.33;
+        let faultSizeY = 0.033; // * 0.33;
+        drawRect(
+          canvas,
+          context,
+          "darkgrey",
+          faultPosX,
+          faultPosY,
+          faultSizeX,
+          faultSizeY,
+          false
+        );
+      }
+      if (newMachine.toolbox) {
+        let faultPosX = newMachine.x + 0.066;
+        let faultPosY = newMachine.y;
+        let faultSizeX = 0.033; // * 0.33;
+        let faultSizeY = 0.033; // * 0.33;
+        drawRect(
+          canvas,
+          context,
+          "DarkRed",
+          faultPosX,
+          faultPosY,
+          faultSizeX,
+          faultSizeY,
+          false
+        );
+      }
+      for (let i = 0; i < newMachine.faults; i++) {
+        let faultPosX = newMachine.x + 0.1 * 0.33 * i;
+        let faultPosY = newMachine.y + 0.1 * 0.66;
+        let faultSizeX = 0.033; // * 0.33;
+        let faultSizeY = 0.033; // * 0.33;
+        drawRect(
+          canvas,
+          context,
+          newMachine.type.faultColour,
+          faultPosX,
+          faultPosY,
+          faultSizeX,
+          faultSizeY,
+          false
+        );
+      }
       context.fillStyle = newMachine.type.colour;
       context.font = "10px Arial";
       context.fillText(newMachine.name, scaledPosX, scaledPosY - 5);
-      // for (let )
     }
   };
 
@@ -220,6 +268,10 @@ const CanvasHelper: React.FC = () => {
 
   function givePlayerSpanner() {
     for (let i = 0; i < 2; i++) {
+      if (spannerDeckGame.length <= 0) {
+        gameEvents = "Ran out of spanners!";
+        newGame = true;
+      }
       let newSpanner = spannerDeckGame.pop();
       if (newSpanner?.type == machine.type6) {
         gameEvents = "Player " + (currentPlayerNum + 1) + " draw a JAM!";
@@ -241,10 +293,33 @@ const CanvasHelper: React.FC = () => {
       for (let j = 0; j < 2; j++) {
         let newSpanner = spannerDeckGame.pop();
         if (newSpanner) newPlayer.spanners.push(newSpanner);
-        if (spannerDeckGame.length <= 0) newGame = true;
       }
       players.push(newPlayer);
     }
+  }
+
+  function drawFaultCards(num: number, faults: number = 1) {
+    for (let i = 0; i < num; i++) getFaultCard(faults);
+  }
+
+  function getFaultCard(num: number = 1) {
+    let newFault = faultDeckGame.pop();
+    if (!newFault) return;
+    giveFaultsToMachine(newFault.machineRef, num);
+    faultDeckGameDiscard.push(newFault);
+  }
+
+  function giveFaultsToMachine(machine: machine.machine, num: number) {
+    if (num === 3) {
+      machine.faults = 3;
+      return;
+    }
+    machine.faults += num;
+    if (machine.faults >= 4) {
+      machine.faults = 4;
+      gameEvents = machine.name + " is now on FIRE!";
+    }
+    return;
   }
 
   const redrawAll = () => {
@@ -259,12 +334,16 @@ const CanvasHelper: React.FC = () => {
           player.makeSpannerDeck();
           fault.buildFaultCards();
           spannerDeckGame = shuffleArray<player.spanner>(player.spannerDeck);
+          faultDeckGameDiscard = [];
           faultDeckGame = shuffleArray<fault.faultCard>(fault.faultDeck);
           setupPlayers();
           player.addJamSpanners(spannerDeckGame);
           spannerDeckGame = shuffleArray<player.spanner>(spannerDeckGame);
           currentPlayer = players[0];
-          currentPlayerNum = 1;
+          currentPlayerNum = 0;
+          drawFaultCards(3, 3);
+          drawFaultCards(3, 2);
+          drawFaultCards(3, 1);
         }
         // context.clearRect(0, 0, canvas.width, canvas.height); // Clear the entire canvas
         // clear cavnas
@@ -305,6 +384,7 @@ const CanvasHelper: React.FC = () => {
         // --------------------------------------- end players turn
         if (drawRect(canvas, context, "red", 0.75, 0.0, 0.15, 0.1)) {
           givePlayerSpanner();
+          drawFaultCards(2, 1);
           currentPlayerNum = currentPlayerNum + 1;
           if (currentPlayerNum >= players.length) {
             currentPlayerNum = 0;

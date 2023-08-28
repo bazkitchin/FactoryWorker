@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 export type machineType = {
   name: string;
   colour: string;
+  faultColour: string;
 };
 
 export type machine = {
@@ -17,15 +18,36 @@ export type machine = {
   links: machine[];
 };
 
-export const type1: machineType = { name: "Office", colour: "blue" };
-export const type2: machineType = { name: "Assembly", colour: "green" };
-export const type3: machineType = { name: "Chemical", colour: "yellow" };
+export const type1: machineType = {
+  name: "Office",
+  colour: "blue",
+  faultColour: "DeepSkyBlue",
+};
+export const type2: machineType = {
+  name: "Assembly",
+  colour: "green",
+  faultColour: "LimeGreen",
+};
+export const type3: machineType = {
+  name: "Chemical",
+  colour: "yellow",
+  faultColour: "Orange",
+};
 export const type4: machineType = {
   name: "Fabrication",
-  colour: "darkslategray",
+  colour: "slategray",
+  faultColour: "darkslategray",
 };
-export const type5: machineType = { name: "Special", colour: "silver" };
-export const type6: machineType = { name: "JAM!", colour: "red" };
+export const type5: machineType = {
+  name: "Special",
+  colour: "silver",
+  faultColour: "black",
+};
+export const type6: machineType = {
+  name: "JAM!",
+  colour: "red",
+  faultColour: "black",
+};
 
 // ------------------------------------------------------ Office Machines
 let machine1: machine = {
